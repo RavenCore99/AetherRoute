@@ -10,6 +10,7 @@ on:
       - "servidores.py"
       - "scripts/**"
       - "tests/**"
+      - "web/**"
       - "requirements*.txt"
       - "PLANNING.md"
       - ".github/workflows/api-tests.yml"
@@ -34,3 +35,5 @@ jobs:
           .venv/bin/python -m ruff check tests
           .venv/bin/python -m ruff format --check tests
           .venv/bin/python -m pytest tests -q
+      - name: Verificar JavaScript de la interfaz
+        run: node --check web/script.js
