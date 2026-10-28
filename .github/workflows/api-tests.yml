@@ -36,7 +36,9 @@ jobs:
           .venv/bin/python -m ruff format --check tests scripts/demo.py
           .venv/bin/python -m pytest tests -q
       - name: Verificar JavaScript de la interfaz
-        run: node --check web/script.js
+        run: |
+          node --check web/script.js
+          node --test tests/theme.test.cjs
   windows-demo:
     runs-on: windows-latest
     steps:
