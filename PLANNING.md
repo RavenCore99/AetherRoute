@@ -18,7 +18,7 @@ Una página web que consuma el balanceador (`balanceador.py`) y los 3 servidores
 |---|------|-----------|---------------|
 | D1 | "No modificar ni reconstruir la API" (PDF §3) vs. "pulir los 2 `.py`" | La API actual **no arranca** (ver §3). | Solo correcciones mínimas que conserven rutas y formas JSON. Todo lo nuevo va en archivos aparte. Mencionarlo en el informe como "correcciones", no "reconstrucción". |
 | D2 | React + Tailwind vs. HTML/CSS/JS | El PDF exige explícitamente los 3 archivos `index.html`, `estilos.css`, `script.js`. | Entregable en **HTML/CSS/JS puro**. React/Tailwind solo como versión extra si sobra tiempo (§9); no sustituye la entrega. |
-| D3 | Firebase Hosting | Sirve solo archivos estáticos; **no ejecuta FastAPI**. Detener servidores en la prueba 3 exige procesos locales. | Demo en vivo **local**. Firebase queda como copia publicada con `API_BASE` configurable. |
+| D3 | Demo local y Hosting | **Resuelto por Raven:** la entrega y las pruebas del PDF se ejecutan en cada equipo desde un clon, sin Firebase ni `.env`. | `README.md` documenta arranque local; Hosting y un backend HTTPS se posponen y no bloquean la entrega. |
 | D4 | Base de datos | Hoy `historial` vive en memoria y se pierde al reiniciar. | SQLite en un módulo opcional separado (§9), sin tocar el contrato de la API. |
 | D5 | Cloudinary | Es almacenamiento de archivos, no una base de datos. | Úsalo solo para **evidencias** (capturas, JSON de pruebas), subidas desde backend (§9). |
 
@@ -178,7 +178,7 @@ Fuente: `hermes_desktop_desing/`. Es **inspiración**, no código a copiar.
 
 - [ ] Informe: arquitectura (diagrama), correcciones a los `.py` y por qué, decisiones de diseño, tabla de pruebas con evidencias, problemas y soluciones.
 - [ ] Guion de demo de 5 min: iniciar → solicitudes → detener uno → detener todos → recuperar.
-- [ ] Ensayo completo en una máquina limpia (clonar, instalar, `iniciar.sh`).
+- [ ] Ensayo completo desde un clon en otra máquina del grupo siguiendo `README.md` (arranque, seis pruebas visuales y parada).
 
 ## 6. Buenas prácticas
 
