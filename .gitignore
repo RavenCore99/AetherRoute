@@ -1,0 +1,28 @@
+CLAUDE.md
+__pycache__/
+*.pyc
+*.pyo
+config.json
+base_datos_pdfs.db
+
+.vscode
+# APIS
+.env
+.env.*
+.venv/
+venv/
+
+# Firebase
+.firebase/
+
+# Datos locales
+*.db
+
+# Frontend (Electron + React + Vite)
+node_modules/
+/dist
+.vite/
+*.log
+npm-debug.log*
+
+
