@@ -23,7 +23,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-tema]) {
     color-scheme: dark;
     --ui-bg-primary: #111d1e;
     --ui-bg-secondary: #1d2b2b;
@@ -39,6 +39,23 @@
     --ui-danger: #f0aaa2;
     --shadow-nous: 0 12px 40px #00000033;
   }
+}
+
+:root[data-tema="oscuro"] {
+  color-scheme: dark;
+  --ui-bg-primary: #111d1e;
+  --ui-bg-secondary: #1d2b2b;
+  --ui-bg-quaternary: #293b39;
+  --ui-text-primary: #e8eee7;
+  --ui-text-secondary: #afc5bd;
+  --ui-text-tertiary: #afc5bd;
+  --ui-stroke-tertiary: #49605a;
+  --ui-accent: #b7d7af;
+  --ui-accent-hover: #d4e7cf;
+  --ui-accent-contrast: #111d1e;
+  --ui-positive: #b7d7af;
+  --ui-danger: #f0aaa2;
+  --shadow-nous: 0 12px 40px #00000033;
 }
 
 * { box-sizing: border-box; }
@@ -64,9 +81,16 @@ header {
   align-items: end;
   padding-bottom: clamp(2rem, 4vw, 4rem);
 }
-.marca {
+.barra-marca {
   grid-column: 1 / -1;
-  margin: 0 0 clamp(1.75rem, 3vw, 3.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+  margin-bottom: clamp(1.75rem, 3vw, 3.5rem);
+}
+.marca {
+  margin: 0;
   color: var(--ui-accent);
   font-size: 0.85rem;
   font-weight: 750;
@@ -144,6 +168,8 @@ section {
 .boton:hover:not(:disabled) { background: var(--ui-accent-hover); }
 .boton--secundario { background: transparent; color: var(--ui-accent); }
 .boton--secundario:hover:not(:disabled) { color: var(--ui-accent-contrast); }
+.tema-control { display: inline-flex; align-items: center; gap: var(--espacio-1); }
+.tema-control span[aria-hidden] { font-size: 1.2rem; line-height: 1; }
 .boton:disabled { cursor: not-allowed; opacity: 0.55; }
 .boton:focus-visible { outline: 3px solid var(--ui-accent); outline-offset: 3px; }
 .tabla-contenedor { overflow-x: auto; margin-top: var(--espacio-3); }
@@ -189,7 +215,7 @@ td { font-variant-numeric: tabular-nums; }
 
 @media (max-width: 36rem) {
   .contenedor { width: min(100% - 2rem, 76rem); padding-top: 1.75rem; }
-  .marca { margin-bottom: 3rem; }
+  .barra-marca { margin-bottom: 3rem; }
   h1 { font-size: clamp(2.2rem, 9vw, 3rem); }
   .resumen { gap: var(--espacio-2); }
   .metrica + .metrica { padding-left: var(--espacio-2); }

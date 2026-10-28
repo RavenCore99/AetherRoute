@@ -4,10 +4,14 @@ const estado = {
   servidores: null,
   estadisticas: null,
   ocupado: false,
+  tema: null,
   vistaPrevia: location.protocol === "https:" && API_BASE.startsWith("http:"),
 };
 
 const elementos = {
+  tema: document.querySelector("#tema"),
+  temaEtiqueta: document.querySelector("#tema-etiqueta"),
+  temaIcono: document.querySelector("#tema-icono"),
   aviso: document.querySelector("#aviso"),
   totalSolicitudes: document.querySelector("#total-solicitudes"),
   totalServidores: document.querySelector("#total-servidores"),
@@ -20,6 +24,41 @@ const elementos = {
   actualizar: document.querySelector("#actualizar"),
   solicitar: document.querySelector("#solicitar"),
 };
+
+const temaSistema = matchMedia("(prefers-color-scheme: dark)");
+
+function mostrarTema() {
+  const oscuro = estado.tema ? estado.tema === "oscuro" : temaSistema.matches;
+  const siguiente = oscuro ? "claro" : "oscuro";
+  elementos.temaEtiqueta.textContent = `Modo ${siguiente}`;
+  elementos.temaIcono.textContent = oscuro ? "☀" : "☾";
+  elementos.tema.setAttribute("aria-label", `Cambiar a tema ${siguiente}`);
+}
+
+function restaurarTema() {
+  try {
+    const guardado = localStorage.getItem("aetherroute-tema");
+    if (guardado === "claro" || guardado === "oscuro") {
+      estado.tema = guardado;
+      document.documentElement.dataset.tema = guardado;
+    }
+  } catch {
+    // El sistema sigue determinando el tema si el almacenamiento está bloqueado.
+  }
+  mostrarTema();
+}
+
+function cambiarTema() {
+  const oscuro = estado.tema ? estado.tema === "oscuro" : temaSistema.matches;
+  estado.tema = oscuro ? "claro" : "oscuro";
+  document.documentElement.dataset.tema = estado.tema;
+  try {
+    localStorage.setItem("aetherroute-tema", estado.tema);
+  } catch {
+    // El tema de esta sesión sigue funcionando sin almacenamiento.
+  }
+  mostrarTema();
+}
 
 async function api(ruta) {
   const controlador = new AbortController();
@@ -155,6 +194,11 @@ async function solicitar() {
 }
 
 function iniciar() {
+  restaurarTema();
+  elementos.tema.addEventListener("click", cambiarTema);
+  temaSistema.addEventListener("change", () => {
+    if (!estado.tema) mostrarTema();
+  });
   elementos.actualizar.addEventListener("click", actualizar);
   elementos.solicitar.addEventListener("click", solicitar);
   if (estado.vistaPrevia) {
