@@ -108,8 +108,8 @@ Hay dos entornos (`venv/` y `.venv/`) con muchos paquetes ajenos. Usar uno solo 
 
 HTML semántico + `script.js` conectado. Prioridad: que todo funcione y se pueda probar.
 
-- [ ] `API_BASE` en una constante al inicio de `script.js` (por defecto `http://127.0.0.1:8000`).
-- [ ] Helper único `api(ruta)` con `fetch`, `AbortController` (timeout ~3 s) y errores normalizados:
+- [x] `API_BASE` en una constante al inicio de `script.js` (por defecto `http://127.0.0.1:8000`).
+- [x] Helper único `api(ruta)` con `fetch`, `AbortController` (timeout ~3 s) y errores normalizados:
 
   | Causa | Mensaje para el usuario |
   |-------|-------------------------|
@@ -118,13 +118,13 @@ HTML semántico + `script.js` conectado. Prioridad: que todo funcione y se pueda
   | Otro HTTP no OK | La petición falló (HTTP *n*). |
   | Fallo solo en estadísticas | No se pudieron cargar las estadísticas. |
 
-- [ ] Resumen: `total_solicitudes` y `total_servidores`.
-- [ ] Tabla de servidores: nombre, puerto, estado (activo/inactivo diferenciado por color **y** texto/icono); botón **Actualizar**.
-- [ ] Botón **Enviar solicitud** (nombre exigido): muestra servidor que atendió, `contador` y `resultado`; tras responder, refresca estadísticas (y servidores).
-- [ ] Estadísticas: barras de progreso por servidor; incluir con 0 los servidores sin solicitudes (cruzando con `/servidores`).
-- [ ] Área de mensajes (éxito/error) con marca de hora; máximo ~20 entradas.
-- [ ] Deshabilitar botones mientras hay una petición en curso (evita dobles envíos).
-- [ ] Pintar datos con `textContent`, nunca `innerHTML` con datos de la API.
+- [x] Resumen: `total_solicitudes` y `total_servidores`.
+- [x] Tabla de servidores: nombre, puerto, estado (activo/inactivo diferenciado por color **y** texto/icono); botón **Actualizar**.
+- [x] Botón **Enviar solicitud** (nombre exigido): muestra servidor que atendió, `contador` y `resultado`; tras responder, refresca estadísticas (y servidores).
+- [x] Estadísticas: barras de progreso por servidor; incluir con 0 los servidores sin solicitudes (cruzando con `/servidores`).
+- [x] Área de mensajes (éxito/error) con marca de hora; máximo ~20 entradas.
+- [x] Deshabilitar botones mientras hay una petición en curso (evita dobles envíos).
+- [x] Pintar datos con `textContent`, nunca `innerHTML` con datos de la API.
 
 **Listo cuando:** las 6 pruebas del PDF se pueden ejecutar a mano desde el navegador.
 
