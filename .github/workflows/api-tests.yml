@@ -32,8 +32,28 @@ jobs:
           .venv/bin/python -m pip install -r requirements-dev.txt
       - name: Verificar pruebas y estilo
         run: |
-          .venv/bin/python -m ruff check tests
-          .venv/bin/python -m ruff format --check tests
+          .venv/bin/python -m ruff check tests scripts/demo.py
+          .venv/bin/python -m ruff format --check tests scripts/demo.py
           .venv/bin/python -m pytest tests -q
       - name: Verificar JavaScript de la interfaz
         run: node --check web/script.js
+  windows-demo:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Descargar, instalar y probar demo de Windows
+        shell: pwsh
+        env:
+          AETHER_REF: ${{ github.head_ref || 'main' }}
+        run: |
+          $destino = Join-Path $env:RUNNER_TEMP 'aetherroute-windows'
+          & .\scripts\instalar-windows.ps1 -Destino $destino -Ref $env:AETHER_REF -NoRun
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $python = Join-Path $destino '.venv\Scripts\python.exe'
+          & $python -m pip install -r (Join-Path $destino 'requirements-dev.txt')
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $python -m pytest (Join-Path $destino 'tests\test_demo.py') -q
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

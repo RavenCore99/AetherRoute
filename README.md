@@ -1,10 +1,22 @@
 # AetherRoute — demo local
 
-La entrega del taller usa `web/index.html`, `web/estilos.css` y `web/script.js` para consultar un balanceador FastAPI y tres servidores. No necesita Firebase, `.env` ni archivos privados para ejecutarse.
+La entrega del taller usa `web/index.html`, `web/estilos.css` y `web/script.js` para consultar un balanceador FastAPI y tres servidores. No necesita Firebase ni `.env` para ejecutarse.
+
+## Windows: instalar y abrir con un comando
+
+Instala [Python 3.14 para Windows](https://www.python.org/downloads/windows/) con su lanzador `py`. Abre PowerShell y pega esta línea del repositorio oficial:
+
+```powershell
+$f=Join-Path $env:TEMP 'aetherroute-instalar.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/RavenCore99/AetherRoute/main/scripts/instalar-windows.ps1' -OutFile $f; powershell.exe -NoProfile -ExecutionPolicy Bypass -File $f
+```
+
+El script pregunta en qué **carpeta nueva** guardar el proyecto: descarga el ZIP público de `main`, lo descomprime allí, crea `.venv`, instala las dependencias y abre la demo. No requiere Git ni WSL. El script es código ejecutable descargado de este repositorio; puedes [revisarlo antes de ejecutarlo](scripts/instalar-windows.ps1). No introduzcas credenciales ni uses una URL distinta.
+
+En la terminal de la demo, escribe `1`, `2` o `3` para detener o recuperar ese servidor y ver el cambio en el navegador; escribe `q` para detener todo. El instalador muestra el comando para volver a abrir la demo sin descargarla de nuevo. Necesitas internet para la descarga y la instalación inicial, pero no para ejecutar el proyecto ya instalado.
 
 ## Requisitos
 
-- Linux o Windows con WSL (los scripts usan Bash y `/proc`).
+- Linux o Windows con WSL para los scripts Bash (Windows nativo: usa el instalador anterior).
 - Python 3.14 con `venv`, Git y conexión a internet para instalar paquetes la primera vez.
 - Puertos locales 5500 y 8000–8003 libres.
 
