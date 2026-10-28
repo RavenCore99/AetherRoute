@@ -14,9 +14,9 @@ El script pregunta en qué **carpeta nueva** guardar el proyecto: descarga el ZI
 
 En la terminal de la demo, escribe `1`, `2` o `3` para detener o recuperar ese servidor y ver el cambio en el navegador; escribe `q` para detener todo. El instalador muestra el comando para volver a abrir la demo sin descargarla de nuevo. Necesitas internet para la descarga y la instalación inicial, pero no para ejecutar el proyecto ya instalado.
 
-## Requisitos
+## Requisitos para Linux/WSL
 
-- Linux o Windows con WSL para los scripts Bash (Windows nativo: usa el instalador anterior).
+- Linux o Windows con WSL (los scripts siguientes usan Bash y `/proc`).
 - Python 3.14 con `venv`, Git y conexión a internet para instalar paquetes la primera vez.
 - Puertos locales 5500 y 8000–8003 libres.
 
