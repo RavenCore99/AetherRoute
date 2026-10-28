@@ -6,11 +6,6 @@ a firebase **NO subir archivos .env** ni mucho menos mostrarlos en frontend
 ## app name
 AetherRoute **Nombre sugerido para la app**
 
-
-**Nota** ya esta inicializado Firebase y conectado. tambien considerar que los deploys mediante PRs de forma automatica se suben o deberian subirse los cambios al hosting
-
-aetherroute0.web.app es la URL oficial a usarse para el desarrollo
-
 ## 1. Objetivo
 
 Una página web que consuma el balanceador (`balanceador.py`) y los 3 servidores (`servidores.py`), muestre su estado en vivo y pase las 6 pruebas funcionales del PDF, con evidencias y demo en vivo.
