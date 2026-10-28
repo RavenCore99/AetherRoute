@@ -1,3 +1,5 @@
+from collections import Counter
+
 from fastapi import FastAPI, HTTPException
 import httpx 
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,7 +13,7 @@ app = FastAPI(
 app.add_middleware(
    CORSMiddleware,
    allow_origins=["*"],
-   allow_credentials=True,
+   allow_credentials=False,
    allow_methods=["*"],
    allow_headers=["*"],
 )
@@ -20,35 +22,35 @@ app.add_middleware(
 servidores = [
 {
     "nombre": "Servidor 1", 
-    "url": "http://127.0.1.1:8001",
+    "url": "http://127.0.0.1:8001",
     "puerto": 8001
 },
 {
     "nombre": "Servidor 2", 
-    "url": "http://127.0.1.1:8002",
+    "url": "http://127.0.0.1:8002",
     "puerto": 8002
 },
 {
     "nombre": "Servidor 3", 
-    "url": "http://127.0.1.1:8003",
+    "url": "http://127.0.0.1:8003",
     "puerto": 8003
 }]
     
 siguiente = 0
 
-historial = []
+solicitudes_por_servidor = Counter()
 
 @app.get("/")
-def inicio():
+def inicio() -> dict[str, object]:
     return {
         "Sistema": "Red de Servidores dinamica",
         "servidores_configurados": len(servidores),
-        "Solicitudes_envidadas": len(historial),
+        "Solicitudes_envidadas": sum(solicitudes_por_servidor.values()),
         "mensaje": "El API esta funcionando correctamente" 
     }
 
-@app.get("/Servidores")
-async def consultar_servidores():
+@app.get("/servidores")
+async def consultar_servidores() -> dict[str, object]:
     resultados = []
     async with httpx.AsyncClient(timeout=2.0) as client:
         for servidor in servidores:
@@ -63,18 +65,18 @@ async def consultar_servidores():
 
             except httpx.RequestError:
                 estado = "Inactivo"    
-            resultado.append({
+            resultados.append({
                 "nombre": servidor["nombre"],
                 "url": servidor["url"],
                 "puerto": servidor["puerto"],
                 "estado": estado
             })   
     return{
-        total_servidores: len(servidores),
+        "total_servidores": len(servidores),
         "servidores": resultados
     }
 @app.get("/solicitar")
-async def solicitar():
+async def solicitar() -> dict[str, object]:
     global siguiente
 
 
@@ -86,36 +88,32 @@ async def solicitar():
             siguiente= (siguiente + 1) % cantidad
 
             try:
-                salud = await cliente.get(
+                salud = await client.get(
                     servidor["url"] + "/health"
                 )
-                if salud.status_code == 200:
-                     respuesta = await client.get(
-                         servidor["url"] + "/procesar"
-                         
+                if salud.status_code != 200:
+                    continue
+                respuesta = await client.get(
+                    servidor["url"] + "/procesar"
                 )
                 if respuesta.status_code == 200:
                     datos = respuesta.json()
-                    historial.append(datos)
+                    solicitudes_por_servidor[datos["servidor"]] += 1
                     return datos
 
             except httpx.RequestError:     
                 continue 
 
-raise HTTPException(
-    status_code=503,
-    detail="No hay servidores disponibles"
-)   
+    raise HTTPException(
+        status_code=503,
+        detail="No hay servidores disponibles"
+    )
 
 
 @app.get("/estadisticas")
-def estadisticas():
-    resumen = {}
-    for solicitud in historial:
-        nombre = solicitud["servidor"]
-        resumen [nombre] = resumen.get(nombre, 0) + 1
+def estadisticas() -> dict[str, object]:
     return {
-        "total_solicitudes": len(historial),
-        "Solicitudes_por_servidor": resumen
+        "total_solicitudes": sum(solicitudes_por_servidor.values()),
+        "Solicitudes_por_servidor": dict(solicitudes_por_servidor)
 
     }
