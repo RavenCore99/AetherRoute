@@ -1,0 +1,33 @@
+name: API tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "balanceador.py"
+      - "servidores.py"
+      - "scripts/**"
+      - "tests/**"
+      - "requirements*.txt"
+      - ".github/workflows/api-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Instalar dependencias de desarrollo
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -r requirements-dev.txt
+      - name: Verificar pruebas y estilo
+        run: |
+          .venv/bin/python -m ruff check tests
+          .venv/bin/python -m ruff format --check tests
+          .venv/bin/python -m pytest tests -q
