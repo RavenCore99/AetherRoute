@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AetherRoute — Red dinámica</title>
+    <link rel="stylesheet" href="./estilos.css">
+    <script src="./script.js" defer></script>
+  </head>
+  <body>
+    <main class="contenedor">
+      <header>
+        <p class="marca">AetherRoute</p>
+        <h1>Panel de administración de servidores dinámicos</h1>
+        <p class="descripcion">Supervisa la red y distribuye peticiones en tiempo real.</p>
+      </header>
+
+      <p id="aviso" role="status" aria-live="polite" hidden></p>
+
+      <section class="resumen" aria-label="Resumen del sistema">
+        <div class="metrica">
+          <h2>Atendidas</h2>
+          <output id="total-solicitudes" aria-label="Solicitudes atendidas"></output>
+        </div>
+        <div class="metrica">
+          <h2>Configurados</h2>
+          <output id="total-servidores" aria-label="Servidores configurados"></output>
+        </div>
+      </section>
+
+      <section aria-labelledby="titulo-estado">
+        <div class="cabecera-seccion">
+          <h2 id="titulo-estado">Estado</h2>
+          <button id="actualizar" class="boton boton--secundario" type="button">Actualizar</button>
+        </div>
+        <div class="tabla-contenedor">
+          <table>
+            <thead><tr><th scope="col">Nombre</th><th scope="col">Puerto</th><th scope="col">Disponibilidad</th></tr></thead>
+            <tbody id="tabla-servidores"></tbody>
+          </table>
+        </div>
+        <p id="vacio-servidores" class="vacio" hidden>Sin datos de la red.</p>
+      </section>
+
+      <section aria-labelledby="titulo-accion">
+        <h2 id="titulo-accion">Gestión</h2>
+        <button id="solicitar" class="boton" type="button">Enviar solicitud</button>
+        <p id="resultado" role="status" aria-live="polite"></p>
+      </section>
+
+      <section aria-labelledby="titulo-reparto">
+        <h2 id="titulo-reparto">Reparto</h2>
+        <div id="estadisticas"></div>
+        <p id="vacio-estadisticas" class="vacio" hidden>Sin estadísticas disponibles.</p>
+      </section>
+
+      <section aria-labelledby="titulo-eventos">
+        <h2 id="titulo-eventos">Eventos</h2>
+        <ol id="eventos" aria-live="polite" aria-relevant="additions"></ol>
+      </section>
+    </main>
+  </body>
+</html>
