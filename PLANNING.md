@@ -95,12 +95,12 @@ Hay dos entornos (`venv/` y `.venv/`) con muchos paquetes ajenos. Usar uno solo 
 
 ### Fase 1 — Pruebas de la API
 
-- [ ] `pytest` + `httpx` contra el sistema levantado:
+- [x] `pytest` + `httpx` contra el sistema levantado:
   - Rotación round-robin y contadores.
   - Un servidor caído se omite y `/servidores` lo marca `Inactivo`.
   - Todos caídos → `503` con `detail`.
   - Servidor que vuelve → se reincorpora.
-- [ ] Verificar CORS desde `http://localhost:5500` y desde `file://`.
+- [x] Verificar CORS desde `http://localhost:5500` y desde `file://` (origen `null`).
 
 **Listo cuando:** los tests pasan y cubren las pruebas 2, 3, 5 y 6 del PDF a nivel API.
 
