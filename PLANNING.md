@@ -6,6 +6,11 @@ a firebase **NO subir archivos .env** ni mucho menos mostrarlos en frontend
 ## app name
 AetherRoute **Nombre sugerido para la app**
 
+
+**Nota** ya esta inicializado Firebase y conectado. tambien considerar que los deploys mediante PRs de forma automatica se suben o deberian subirse los cambios al hosting
+
+aetherroute0.web.app es la URL oficial a usarse para el desarrollo
+
 ## 1. Objetivo
 
 Una página web que consuma el balanceador (`balanceador.py`) y los 3 servidores (`servidores.py`), muestre su estado en vivo y pase las 6 pruebas funcionales del PDF, con evidencias y demo en vivo.
@@ -86,10 +91,10 @@ Hay dos entornos (`venv/` y `.venv/`) con muchos paquetes ajenos. Usar uno solo 
 
 ### Fase 0 — Entorno y API funcionando
 
-- [ ] Elegir un solo entorno virtual; generar `requirements.txt`.
-- [ ] Aplicar las correcciones de §3 en ambos `.py`.
-- [ ] `scripts/iniciar.sh`: lanza puertos 8001–8003 y el balanceador en 8000; `detener.sh` detiene uno o todos por puerto.
-- [ ] Verificar con `curl` los 4 endpoints del contrato.
+- [x] Usar `.venv` y fijar `requirements.txt` (FastAPI, httpx y uvicorn).
+- [x] Aplicar las correcciones de §3 en ambos `.py`.
+- [x] `scripts/iniciar.sh`: lanza puertos 8001–8003 y el balanceador en 8000; `detener.sh` detiene uno o todos por puerto.
+- [x] Verificar con `curl` los 4 endpoints del contrato.
 
 **Listo cuando:** `curl /solicitar` ×6 rota 1→2→3→1→2→3 y `/estadisticas` suma 6.
 
