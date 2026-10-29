@@ -165,6 +165,8 @@ Fuente: `hermes_desktop_desing/`. Es **inspiración**, no código a copiar.
 |---|-----------------|---------------|-----------|
 | 1 | Consultar servidores | Cargar la página con los 3 activos | `evidencias/01-servidores.png` |
 | 2 | 5 solicitudes | Pulsar **Enviar solicitud** ×5 | `02-solicitudes.png` + cuál atendió cada una |
+**Verificado el 2026-10-29:** Lighthouse 13.6.0 local: accesibilidad 100 y rendimiento 100 en móvil y escritorio, CLS 0.001. Resultados y reproducción en `docs/reports/fase3-lighthouse.md`; 19 pruebas JS, 7 Python y escenarios funcionales del PDF repetidos en navegador.
+
 | 3 | Detener un servidor | `detener.sh 8002` → **Actualizar** | `03-servidor-inactivo.png` |
 | 4 | Estadísticas cambian | Comparar antes/después de enviar | `04-estadisticas.png` (dos capturas) |
 | 5 | Sin servidores | Detener los 3 → enviar solicitud | `05-sin-servidores.png` |
