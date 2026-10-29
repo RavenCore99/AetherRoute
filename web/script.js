@@ -5,10 +5,12 @@ const estado = {
   estadisticas: null,
   ocupado: false,
   tema: null,
+  temporizadorPulso: null,
   vistaPrevia: location.protocol === "https:" && API_BASE.startsWith("http:"),
 };
 
 const elementos = {
+  ambiente: document.querySelector("#ambiente"),
   tema: document.querySelector("#tema"),
   temaEtiqueta: document.querySelector("#tema-etiqueta"),
   temaIcono: document.querySelector("#tema-icono"),
@@ -60,6 +62,14 @@ function cambiarTema() {
   mostrarTema();
 }
 
+function pulsoAmbiental(tipo) {
+  elementos.ambiente.dataset.evento = tipo;
+  clearTimeout(estado.temporizadorPulso);
+  estado.temporizadorPulso = setTimeout(() => {
+    delete elementos.ambiente.dataset.evento;
+  }, 800);
+}
+
 async function api(ruta) {
   const controlador = new AbortController();
   const temporizador = setTimeout(() => controlador.abort(), 3000);
@@ -84,6 +94,7 @@ async function api(ruta) {
 }
 
 function evento(mensaje, tipo = "info") {
+  if (tipo === "error" && !estado.vistaPrevia) pulsoAmbiental("error");
   const entrada = document.createElement("li");
   entrada.textContent = `[${new Date().toLocaleTimeString("es-CO")}] ${mensaje}`;
   if (tipo === "error") entrada.classList.add("error");
@@ -139,6 +150,10 @@ function pintarServidores() {
   elementos.totalServidores.classList.remove("esqueleto");
   elementos.totalServidores.setAttribute("aria-busy", "false");
   const lista = estado.servidores?.servidores;
+  const activos = lista?.filter((servidor) => servidor.estado === "Activo").length;
+  document.documentElement.dataset.red = !lista?.length
+    ? "desconocida"
+    : activos === lista.length ? "estable" : activos ? "parcial" : "caida";
   elementos.totalServidores.textContent = estado.servidores?.total_servidores ?? "";
   elementos.vacioServidores.hidden = Boolean(lista?.length);
   if (!lista) return;
@@ -223,6 +238,7 @@ async function solicitar() {
     elementos.resultado.classList.remove("error");
     elementos.resultado.textContent = `${datos.servidor} · petición ${datos.contador} · ${datos.resultado}`;
     evento(`${datos.servidor} atendió la solicitud.`);
+    pulsoAmbiental("solicitud");
     await refrescar();
   } catch (error) {
     elementos.resultado.classList.add("error");
@@ -234,6 +250,7 @@ async function solicitar() {
 }
 
 function iniciar() {
+  document.documentElement.dataset.red = "desconocida";
   restaurarTema();
   elementos.tema.addEventListener("click", cambiarTema);
   temaSistema.addEventListener("change", () => {
@@ -249,6 +266,16 @@ function iniciar() {
     pintarEstadisticas();
     return;
   }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      elementos.ambiente.dataset.pausado = "true";
+    } else {
+      delete elementos.ambiente.dataset.pausado;
+    }
+  });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    elementos.ambiente.classList.add("ambiente--listo");
+  }));
   mostrarEsqueletos();
   actualizar();
 }

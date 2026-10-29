@@ -14,6 +14,7 @@ function crearPagina() {
     return {
       etiqueta,
       children: [],
+      dataset: {},
       hidden: true,
       textContent: "",
       attributes: {},
@@ -37,6 +38,7 @@ function crearPagina() {
   const documento = {
     documentElement: { dataset: {} },
     createElement: nodo,
+    addEventListener() {},
     querySelector(selector) {
       if (!elementos.has(selector)) elementos.set(selector, nodo());
       return elementos.get(selector);
@@ -47,6 +49,7 @@ function crearPagina() {
     location: { protocol: "http:" },
     localStorage: { getItem: () => null },
     matchMedia: () => ({ matches: false, addEventListener() {} }),
+    requestAnimationFrame() {},
     AbortController,
     setTimeout,
     clearTimeout,
