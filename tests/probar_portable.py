@@ -90,6 +90,16 @@ def main() -> None:
         assert proceso.returncode == 0, (salida, errores)
         assert all(libre(puerto) for puerto in PUERTOS)
 
+    except Exception as error:
+        if proceso.poll() is None:
+            proceso.terminate()
+        try:
+            _, errores = proceso.communicate(timeout=10)
+        except subprocess.TimeoutExpired:
+            errores = "La salida quedó abierta tras detener el proceso"
+        raise AssertionError(
+            f"{error}; salida del lanzador: {errores[-4000:]}"
+        ) from error
     finally:
         if proceso.poll() is None:
             proceso.terminate()
