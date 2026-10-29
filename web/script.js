@@ -99,8 +99,45 @@ function ocupar(valor) {
   elementos.solicitar.disabled = valor || estado.vistaPrevia;
 }
 
+function mostrarEsqueletos() {
+  for (const metrica of [elementos.totalSolicitudes, elementos.totalServidores]) {
+    metrica.classList.add("esqueleto");
+    metrica.setAttribute("aria-busy", "true");
+  }
+  elementos.tabla.setAttribute("aria-busy", "true");
+  elementos.estadisticas.setAttribute("aria-busy", "true");
+  elementos.vacioServidores.hidden = true;
+  elementos.vacioEstadisticas.hidden = true;
+
+  for (let indice = 0; indice < 3; indice += 1) {
+    const fila = document.createElement("tr");
+    fila.setAttribute("aria-hidden", "true");
+    for (let columna = 0; columna < 3; columna += 1) {
+      const celda = document.createElement("td");
+      const forma = document.createElement("span");
+      forma.className = "esqueleto esqueleto--texto";
+      celda.append(forma);
+      fila.append(celda);
+    }
+    elementos.tabla.append(fila);
+
+    const barra = document.createElement("div");
+    barra.className = "estadistica";
+    barra.setAttribute("aria-hidden", "true");
+    for (const clase of ["esqueleto--texto", "esqueleto--barra", "esqueleto--cifra"]) {
+      const forma = document.createElement("span");
+      forma.className = `esqueleto ${clase}`;
+      barra.append(forma);
+    }
+    elementos.estadisticas.append(barra);
+  }
+}
+
 function pintarServidores() {
   elementos.tabla.replaceChildren();
+  elementos.tabla.setAttribute("aria-busy", "false");
+  elementos.totalServidores.classList.remove("esqueleto");
+  elementos.totalServidores.setAttribute("aria-busy", "false");
   const lista = estado.servidores?.servidores;
   elementos.totalServidores.textContent = estado.servidores?.total_servidores ?? "";
   elementos.vacioServidores.hidden = Boolean(lista?.length);
@@ -123,6 +160,9 @@ function pintarServidores() {
 
 function pintarEstadisticas() {
   elementos.estadisticas.replaceChildren();
+  elementos.estadisticas.setAttribute("aria-busy", "false");
+  elementos.totalSolicitudes.classList.remove("esqueleto");
+  elementos.totalSolicitudes.setAttribute("aria-busy", "false");
   elementos.totalSolicitudes.textContent = estado.estadisticas?.total_solicitudes ?? "";
   const lista = estado.servidores?.servidores;
   elementos.vacioEstadisticas.hidden = Boolean(estado.estadisticas && lista?.length);
@@ -209,6 +249,7 @@ function iniciar() {
     pintarEstadisticas();
     return;
   }
+  mostrarEsqueletos();
   actualizar();
 }
 
