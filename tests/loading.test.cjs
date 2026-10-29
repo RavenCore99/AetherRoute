@@ -15,6 +15,7 @@ function crearPagina() {
       etiqueta,
       children: [],
       dataset: {},
+      style: {},
       hidden: true,
       textContent: "",
       attributes: {},

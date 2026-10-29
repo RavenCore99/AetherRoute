@@ -26,6 +26,7 @@
   --duracion-shimmer: 1.7s;
   --duracion-ambient: 24s;
   --duracion-pulso: 800ms;
+  --duracion-datos: 450ms;
   --ui-ambient-ink: var(--ui-stroke-tertiary);
 }
 :root[data-red="estable"] { --ui-ambient-ink: var(--ui-positive); }
@@ -177,7 +178,17 @@ h2 {
   color: var(--ui-text-secondary);
   font-size: clamp(1rem, 1.5vw, 1.2rem);
 }
-.vacio { color: var(--ui-text-secondary); }
+.mensaje:not([hidden]):not(:empty) {
+  margin-block: var(--espacio-2) 0;
+  padding-block: var(--espacio-2);
+  border-top: var(--stroke-nous);
+  color: var(--ui-text-secondary);
+}
+.mensaje--vacio { max-width: 40ch; }
+.mensaje.error:not([hidden]) {
+  border-top-color: var(--ui-danger);
+  color: var(--ui-danger);
+}
 section {
   min-width: 0;
   border-top: var(--stroke-nous);
@@ -265,14 +276,8 @@ th {
 td { font-variant-numeric: tabular-nums; }
 .estado--activo { color: var(--ui-positive); font-weight: 750; }
 .estado--inactivo, .error { color: var(--ui-danger); font-weight: 750; }
-#aviso:not([hidden]) {
-  grid-column: 1 / -1;
-  border-top: var(--stroke-nous);
-  background: var(--ui-bg-secondary);
-  padding: var(--espacio-2);
-}
-#resultado { min-height: 3rem; color: var(--ui-text-secondary); }
-#resultado.error { color: var(--ui-danger); }
+#aviso:not([hidden]) { grid-column: 1 / -1; }
+#resultado { min-height: 3rem; }
 #estadisticas { display: grid; gap: var(--espacio-3); margin-top: var(--espacio-3); }
 .estadistica {
   display: grid;
@@ -281,7 +286,24 @@ td { font-variant-numeric: tabular-nums; }
   align-items: center;
   font-variant-numeric: tabular-nums;
 }
-.estadistica progress { width: 100%; height: 0.7rem; accent-color: var(--ui-accent); }
+.barra {
+  position: relative;
+  width: 100%;
+  height: 0.7rem;
+  overflow: hidden;
+  border-radius: var(--radio);
+  background: var(--ui-bg-quaternary);
+}
+.barra progress { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
+.barra__trazo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ui-accent);
+  transform-origin: left center;
+  transition: transform var(--duracion-datos) cubic-bezier(0.23, 1, 0.32, 1);
+}
 #eventos { padding-left: var(--espacio-3); color: var(--ui-text-secondary); }
 #eventos li { padding-block: 0.35rem; }
 #eventos li::marker { color: var(--ui-accent); }
@@ -306,11 +328,12 @@ td { font-variant-numeric: tabular-nums; }
   th { font-size: 0.68rem; letter-spacing: 0; }
   td { font-size: 0.88rem; }
   .estadistica { grid-template-columns: 1fr auto; }
-  .estadistica progress { grid-column: 1 / -1; grid-row: 2; }
+  .estadistica .barra { grid-column: 1 / -1; grid-row: 2; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .boton { transition: none; }
   .esqueleto::after { animation: none; display: none; }
   .ambiente { display: none; }
+  .barra__trazo { transition: none; }
 }
