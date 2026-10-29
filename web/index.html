@@ -50,8 +50,8 @@
             <thead><tr><th scope="col">Nombre</th><th scope="col">Puerto</th><th scope="col">Disponibilidad</th></tr></thead>
             <tbody id="tabla-servidores"></tbody>
           </table>
+          <p id="vacio-servidores" class="mensaje mensaje--vacio" hidden>Sin datos de la red. Verifica la API y pulsa Actualizar.</p>
         </div>
-        <p id="vacio-servidores" class="mensaje mensaje--vacio" hidden>Sin datos de la red. Verifica la API y pulsa Actualizar.</p>
       </section>
 
       <section aria-labelledby="titulo-accion">
@@ -62,8 +62,10 @@
 
       <section aria-labelledby="titulo-reparto">
         <h2 id="titulo-reparto">Reparto</h2>
-        <div id="estadisticas"></div>
-        <p id="vacio-estadisticas" class="mensaje mensaje--vacio" hidden>Sin estadísticas disponibles. Prueba Actualizar.</p>
+        <div class="reparto-contenedor">
+          <div id="estadisticas"></div>
+          <p id="vacio-estadisticas" class="mensaje mensaje--vacio" hidden>Sin estadísticas disponibles. Prueba Actualizar.</p>
+        </div>
       </section>
 
       <section aria-labelledby="titulo-eventos">

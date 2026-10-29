@@ -37,7 +37,7 @@ function mostrarTema() {
   const siguiente = oscuro ? "claro" : "oscuro";
   elementos.temaEtiqueta.textContent = `Modo ${siguiente}`;
   elementos.temaIcono.textContent = oscuro ? "☀" : "☾";
-  elementos.tema.setAttribute("aria-label", `Cambiar a tema ${siguiente}`);
+  elementos.tema.setAttribute("aria-label", `Modo ${siguiente}: activar`);
 }
 
 function restaurarTema() {
