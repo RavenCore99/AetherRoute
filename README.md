@@ -7,7 +7,7 @@ La entrega usa `web/index.html`, `web/estilos.css` y `web/script.js` para consul
 Abre PowerShell (incluido en Windows) y pega este comando del repositorio oficial:
 
 ```powershell
-$f=Join-Path $env:TEMP 'aetherroute-obtener.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/RavenCore99/AetherRoute/main/scripts/obtener-windows.ps1' -OutFile $f; powershell.exe -NoProfile -ExecutionPolicy Bypass -File $f
+$f=Join-Path $env:TEMP 'aetherroute-obtener.ps1'; Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/RavenCore99/AetherRoute/main/scripts/obtener-windows.ps1' -OutFile $f; powershell.exe -NoProfile -ExecutionPolicy Bypass -File $f
 ```
 
 Descarga el último paquete publicado en [GitHub Releases](https://github.com/RavenCore99/AetherRoute/releases/latest), comprueba su SHA-256 contra GitHub, lo descomprime en `AetherRoute` dentro de tu carpeta personal y abre `AetherRoute.exe`. Los fuentes del taller están dentro de `AetherRoute/fuentes/`. Si la carpeta ya existe, crea otra sin sobrescribirla. Puedes [revisar el script](scripts/obtener-windows.ps1) antes de ejecutarlo. Windows puede advertir sobre un ejecutable no firmado: verifica que el enlace proviene de este repositorio; no introduzcas credenciales.

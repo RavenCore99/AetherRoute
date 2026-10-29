@@ -5,6 +5,7 @@ import json
 import os
 import socket
 import subprocess
+import tempfile
 import time
 import urllib.request
 from pathlib import Path
@@ -52,58 +53,63 @@ def main() -> None:
     entorno = os.environ.copy()
     for variable in ("PYTHONPATH", "PYTHONHOME", "VIRTUAL_ENV"):
         entorno.pop(variable, None)
-    proceso = subprocess.Popen(
-        [str(args.binario.resolve()), "--no-browser"],
-        cwd=args.binario.parent,
-        env=entorno,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.PIPE,
-        text=True,
-    )
-    try:
-        for puerto in PUERTOS:
-            esperar(puerto, proceso)
-        with urllib.request.urlopen("http://127.0.0.1:5500/", timeout=5) as respuesta:
-            assert b"Panel de administraci" in respuesta.read()
-        control = consultar("/__demo/estado")
-        assert len(control["servidores"]) == 3
-        peticion = urllib.request.Request(
-            "http://127.0.0.1:5500/__demo/servidor",
-            data=b'{"numero":2}',
-            headers={
-                "Origin": "http://127.0.0.1:5500",
-                "Content-Type": "application/json",
-                "X-Aether-Token": control["token"],
-            },
-            method="POST",
+    with tempfile.TemporaryFile(mode="w+t", encoding="utf-8") as registro:
+        proceso = subprocess.Popen(
+            [str(args.binario.resolve()), "--no-browser"],
+            cwd=args.binario.parent,
+            env=entorno,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
+            stderr=registro,
+            text=True,
         )
-        with urllib.request.urlopen(peticion, timeout=15) as respuesta:
-            assert json.load(respuesta) == {"numero": 2, "activo": False}
-        with urllib.request.urlopen(
-            "http://127.0.0.1:8000/servidores", timeout=5
-        ) as respuesta:
-            assert json.load(respuesta)["servidores"][1]["estado"] == "Inactivo"
-        with urllib.request.urlopen(peticion, timeout=15) as respuesta:
-            assert json.load(respuesta) == {"numero": 2, "activo": True}
-        salida, errores = proceso.communicate("q\n", timeout=30)
-        assert proceso.returncode == 0, (salida, errores)
-        assert all(libre(puerto) for puerto in PUERTOS)
-
-    except Exception as error:
-        if proceso.poll() is None:
-            proceso.terminate()
         try:
-            _, errores = proceso.communicate(timeout=10)
-        except subprocess.TimeoutExpired:
-            errores = "La salida quedó abierta tras detener el proceso"
-        raise AssertionError(
-            f"{error}; salida del lanzador: {errores[-4000:]}"
-        ) from error
-    finally:
-        if proceso.poll() is None:
-            proceso.terminate()
-            proceso.wait(timeout=10)
+            for puerto in PUERTOS:
+                esperar(puerto, proceso)
+            with urllib.request.urlopen(
+                "http://127.0.0.1:5500/", timeout=5
+            ) as respuesta:
+                assert b"Panel de administraci" in respuesta.read()
+            control = consultar("/__demo/estado")
+            assert len(control["servidores"]) == 3
+            peticion = urllib.request.Request(
+                "http://127.0.0.1:5500/__demo/servidor",
+                data=b'{"numero":2}',
+                headers={
+                    "Origin": "http://127.0.0.1:5500",
+                    "Content-Type": "application/json",
+                    "X-Aether-Token": control["token"],
+                },
+                method="POST",
+            )
+            with urllib.request.urlopen(peticion, timeout=15) as respuesta:
+                assert json.load(respuesta) == {"numero": 2, "activo": False}
+            with urllib.request.urlopen(
+                "http://127.0.0.1:8000/servidores", timeout=5
+            ) as respuesta:
+                assert json.load(respuesta)["servidores"][1]["estado"] == "Inactivo"
+            with urllib.request.urlopen(peticion, timeout=15) as respuesta:
+                assert json.load(respuesta) == {"numero": 2, "activo": True}
+            proceso.communicate("q\n", timeout=30)
+            assert proceso.returncode == 0
+            assert all(libre(puerto) for puerto in PUERTOS)
+        except Exception as error:
+            if proceso.poll() is None:
+                proceso.terminate()
+            try:
+                proceso.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                proceso.kill()
+                proceso.wait(timeout=10)
+            registro.seek(0)
+            errores = registro.read()
+            raise AssertionError(
+                f"{error}; salida del lanzador: {errores[-4000:]}"
+            ) from error
+        finally:
+            if proceso.poll() is None:
+                proceso.terminate()
+                proceso.wait(timeout=10)
 
 
 if __name__ == "__main__":

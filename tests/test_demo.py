@@ -38,7 +38,6 @@ def test_lanzador_local_controla_servidores_y_limpia_procesos():
             assert conexion.connect_ex(("127.0.0.1", puerto)) != 0, (
                 f"Puerto {puerto} ocupado"
             )
-
     proceso = subprocess.Popen(
         [sys.executable, str(RAIZ / "scripts/demo.py"), "--no-browser"],
         cwd=RAIZ,
@@ -78,7 +77,7 @@ def test_controles_locales_desde_la_ui_no_alteran_la_api():
         cwd=RAIZ,
         stdin=subprocess.PIPE,
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
         text=True,
     )
     assert proceso.stdin is not None
@@ -110,9 +109,10 @@ def test_controles_locales_desde_la_ui_no_alteran_la_api():
         with urllib.request.urlopen("http://127.0.0.1:8000/servidores") as respuesta:
             assert len(json.load(respuesta)["servidores"]) == 3
     finally:
-        proceso.stdin.write("q\n")
-        proceso.stdin.flush()
-        assert proceso.wait(timeout=10) == 0
+        if proceso.poll() is None:
+            proceso.stdin.write("q\n")
+            proceso.stdin.flush()
+            assert proceso.wait(timeout=10) == 0
 
 
 def test_token_no_ascii_rechaza_sin_derribar_servidor_local():
@@ -121,7 +121,7 @@ def test_token_no_ascii_rechaza_sin_derribar_servidor_local():
         cwd=RAIZ,
         stdin=subprocess.PIPE,
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
         text=True,
     )
     assert proceso.stdin is not None
@@ -147,9 +147,10 @@ def test_token_no_ascii_rechaza_sin_derribar_servidor_local():
         assert error.value.code == 403
         assert consultar()[1]["estado"] == "Activo"
     finally:
-        proceso.stdin.write("q\n")
-        proceso.stdin.flush()
-        assert proceso.wait(timeout=10) == 0
+        if proceso.poll() is None:
+            proceso.stdin.write("q\n")
+            proceso.stdin.flush()
+            assert proceso.wait(timeout=10) == 0
 
 
 def test_binario_portable_reutiliza_su_ejecutable_para_cada_servicio(monkeypatch):
@@ -170,7 +171,7 @@ def test_control_local_no_entrega_token_a_origen_ajeno():
         cwd=RAIZ,
         stdin=subprocess.PIPE,
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
         text=True,
     )
     assert proceso.stdin is not None
@@ -192,6 +193,7 @@ def test_control_local_no_entrega_token_a_origen_ajeno():
                 urllib.request.urlopen(peticion)
             assert error.value.code == 403
     finally:
-        proceso.stdin.write("q\n")
-        proceso.stdin.flush()
-        assert proceso.wait(timeout=10) == 0
+        if proceso.poll() is None:
+            proceso.stdin.write("q\n")
+            proceso.stdin.flush()
+            assert proceso.wait(timeout=10) == 0

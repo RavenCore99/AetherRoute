@@ -28,7 +28,7 @@ try {
         if (-not $asset -or $asset.digest -notmatch '^sha256:[0-9a-fA-F]{64}$') {
             throw 'El release no contiene un ZIP de Windows con SHA-256 verificable.'
         }
-        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zip
+        Invoke-WebRequest -UseBasicParsing -Uri $asset.browser_download_url -OutFile $zip
         $observado = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
         if ($observado -ne $asset.digest.Substring(7).ToLowerInvariant()) {
             throw 'El ZIP descargado no coincide con el SHA-256 publicado en GitHub.'
