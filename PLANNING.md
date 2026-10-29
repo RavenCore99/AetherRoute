@@ -142,8 +142,8 @@ Fuente: `hermes_desktop_desing/`. Es **inspiración**, no código a copiar.
 - [x] Tokens en `estilos.css` con los nombres de `DESIGN.md` (`--ui-text-primary/secondary/tertiary`, `--ui-stroke-tertiary`, `--ui-bg-quaternary`, `--ui-accent`, `--shadow-nous`, `--stroke-nous`), valores para claro y oscuro.
 - [x] Tema: `prefers-color-scheme` por defecto + botón sol/luna; guardar preferencia en `localStorage`.
 - [x] Principios a aplicar: plano (sin tarjeta dentro de tarjeta), separación con espacio y un solo hairline, sin colores literales fuera de los tokens, un único estilo de botón con variantes.
-- [ ] **Skeleton** en tarjetas, tabla y barras mientras llega la primera respuesta (nunca el texto "Cargando…").
-- [ ] **Shimmer** en los skeletons (gradiente animado con `transform`/`background-position`).
+- [x] **Skeleton** en tarjetas, tabla y barras mientras llega la primera respuesta (nunca el texto "Cargando…").
+- [x] **Shimmer** en los skeletons (gradiente animado con `transform`/`background-position`).
 - [ ] **Ambient lighting:** 2–3 resplandores radiales de baja opacidad detrás del contenido, deriva lenta; el color puede reflejar el estado (verde: todos activos, ámbar: parcial, rojo: ninguno).
 - [ ] Contadores numéricos con animación breve; barras con transición de ancho.
 - [x] Transiciones de ~100 ms en controles; listar propiedades, **sin `transition-all`**.
