@@ -145,10 +145,10 @@ Fuente: `hermes_desktop_desing/`. Es **inspiración**, no código a copiar.
 - [x] **Skeleton** en tarjetas, tabla y barras mientras llega la primera respuesta (nunca el texto "Cargando…").
 - [x] **Shimmer** en los skeletons (gradiente animado con `transform`/`background-position`).
 - [x] **Ambient lighting:** 2–3 resplandores radiales de baja opacidad detrás del contenido, deriva lenta; el color puede reflejar el estado (verde: todos activos, ámbar: parcial, rojo: ninguno).
-- [ ] Contadores numéricos con animación breve; barras con transición de ancho.
+- [x] Contadores numéricos con animación breve; barras con transición de ancho.
 - [x] Transiciones de ~100 ms en controles; listar propiedades, **sin `transition-all`**.
-- [ ] `prefers-reduced-motion`: desactivar shimmer, ambient y contadores animados.
-- [ ] Estados vacío y error con un único componente visual cada uno.
+- [x] `prefers-reduced-motion`: desactivar shimmer, ambient y contadores animados.
+- [x] Estados vacío y error con un único componente visual cada uno.
 - [x] Accesibilidad: foco visible, contraste AA, `aria-live="polite"` en mensajes, estados no dependientes solo del color.
 - [x] Responsive: 360 px → escritorio.
 
@@ -158,6 +158,8 @@ Fuente: `hermes_desktop_desing/`. Es **inspiración**, no código a copiar.
 - Descripción de una sola línea. Sin párrafos explicativos ni subtítulos que repitan el título de la sección.
 
 **Listo cuando:** claro/oscuro correctos, skeletons visibles en red lenta, sin animación con `reduced-motion`, Lighthouse accesibilidad ≥ 90.
+
+**Verificado el 2026-10-29:** Lighthouse 13.6.0 local: accesibilidad 100 y rendimiento 100 en móvil y escritorio, CLS 0.001. Resultados y reproducción en `docs/reports/fase3-lighthouse.md`; 19 pruebas JS, 7 Python y escenarios funcionales del PDF repetidos en navegador.
 
 ### Fase 4 — Pruebas funcionales y evidencias
 

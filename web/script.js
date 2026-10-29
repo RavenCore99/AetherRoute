@@ -6,6 +6,8 @@ const estado = {
   ocupado: false,
   tema: null,
   temporizadorPulso: null,
+  animaciones: new Map(),
+  repartoAnterior: null,
   vistaPrevia: location.protocol === "https:" && API_BASE.startsWith("http:"),
 };
 
@@ -28,13 +30,14 @@ const elementos = {
 };
 
 const temaSistema = matchMedia("(prefers-color-scheme: dark)");
+const movimientoReducido = matchMedia("(prefers-reduced-motion: reduce)");
 
 function mostrarTema() {
   const oscuro = estado.tema ? estado.tema === "oscuro" : temaSistema.matches;
   const siguiente = oscuro ? "claro" : "oscuro";
   elementos.temaEtiqueta.textContent = `Modo ${siguiente}`;
   elementos.temaIcono.textContent = oscuro ? "☀" : "☾";
-  elementos.tema.setAttribute("aria-label", `Cambiar a tema ${siguiente}`);
+  elementos.tema.setAttribute("aria-label", `Modo ${siguiente}: activar`);
 }
 
 function restaurarTema() {
@@ -144,6 +147,41 @@ function mostrarEsqueletos() {
   }
 }
 
+function finalizarAnimaciones() {
+  for (const [nodo, animacion] of estado.animaciones) {
+    cancelAnimationFrame(animacion.id);
+    nodo.textContent = animacion.valor;
+  }
+  estado.animaciones.clear();
+}
+
+function animarNumero(nodo, valor, etiqueta) {
+  const pendiente = estado.animaciones.get(nodo);
+  if (pendiente) {
+    cancelAnimationFrame(pendiente.id);
+    estado.animaciones.delete(nodo);
+  }
+  nodo.setAttribute("aria-label", valor == null ? etiqueta : `${etiqueta}: ${valor}`);
+  const anterior = nodo.textContent;
+  if (valor == null || anterior === "" || movimientoReducido.matches || document.visibilityState === "hidden") {
+    nodo.textContent = valor ?? "";
+    return;
+  }
+  const inicio = Number(anterior);
+  if (inicio === valor) return;
+  const comienzo = performance.now();
+  const animacion = { id: null, valor };
+  estado.animaciones.set(nodo, animacion);
+  function avanzar(tiempo) {
+    if (estado.animaciones.get(nodo) !== animacion) return;
+    const progreso = Math.min(1, (tiempo - comienzo) / 450);
+    nodo.textContent = Math.round(inicio + (valor - inicio) * (1 - (1 - progreso) ** 3));
+    if (progreso < 1) animacion.id = requestAnimationFrame(avanzar);
+    else estado.animaciones.delete(nodo);
+  }
+  animacion.id = requestAnimationFrame(avanzar);
+}
+
 function pintarServidores() {
   elementos.tabla.replaceChildren();
   elementos.tabla.setAttribute("aria-busy", "false");
@@ -154,7 +192,7 @@ function pintarServidores() {
   document.documentElement.dataset.red = !lista?.length
     ? "desconocida"
     : activos === lista.length ? "estable" : activos ? "parcial" : "caida";
-  elementos.totalServidores.textContent = estado.servidores?.total_servidores ?? "";
+  animarNumero(elementos.totalServidores, estado.servidores?.total_servidores, "Servidores configurados");
   elementos.vacioServidores.hidden = Boolean(lista?.length);
   if (!lista) return;
 
@@ -178,26 +216,46 @@ function pintarEstadisticas() {
   elementos.estadisticas.setAttribute("aria-busy", "false");
   elementos.totalSolicitudes.classList.remove("esqueleto");
   elementos.totalSolicitudes.setAttribute("aria-busy", "false");
-  elementos.totalSolicitudes.textContent = estado.estadisticas?.total_solicitudes ?? "";
+  animarNumero(elementos.totalSolicitudes, estado.estadisticas?.total_solicitudes, "Solicitudes atendidas");
   const lista = estado.servidores?.servidores;
   elementos.vacioEstadisticas.hidden = Boolean(estado.estadisticas && lista?.length);
-  if (!estado.estadisticas || !lista) return;
+  if (!estado.estadisticas || !lista) {
+    estado.repartoAnterior = null;
+    return;
+  }
 
+  const reparto = new Map();
   for (const servidor of lista) {
     const cantidad = estado.estadisticas.Solicitudes_por_servidor[servidor.nombre] ?? 0;
     const fila = document.createElement("div");
     fila.className = "estadistica";
     const nombre = document.createElement("span");
     nombre.textContent = servidor.nombre;
-    const barra = document.createElement("progress");
-    barra.max = Math.max(1, estado.estadisticas.total_solicitudes);
-    barra.value = cantidad;
-    barra.setAttribute("aria-label", `${servidor.nombre}: ${cantidad} solicitudes`);
+    const barra = document.createElement("div");
+    barra.className = "barra";
+    const progreso = document.createElement("progress");
+    progreso.max = Math.max(1, estado.estadisticas.total_solicitudes);
+    progreso.value = cantidad;
+    progreso.setAttribute("aria-label", `${servidor.nombre}: ${cantidad} solicitudes`);
+    const trazo = document.createElement("span");
+    trazo.className = "barra__trazo";
+    trazo.setAttribute("aria-hidden", "true");
+    const fraccion = cantidad / progreso.max;
+    const anterior = estado.repartoAnterior?.get(servidor.nombre);
+    const animar = anterior != null && anterior !== fraccion && !movimientoReducido.matches
+      && document.visibilityState !== "hidden";
+    trazo.style.transform = `scaleX(${animar ? anterior : fraccion})`;
+    barra.append(progreso, trazo);
     const total = document.createElement("span");
     total.textContent = cantidad;
     fila.append(nombre, barra, total);
     elementos.estadisticas.append(fila);
+    if (animar) requestAnimationFrame(() => requestAnimationFrame(() => {
+      trazo.style.transform = `scaleX(${fraccion})`;
+    }));
+    reparto.set(servidor.nombre, fraccion);
   }
+  estado.repartoAnterior = reparto;
 }
 
 async function refrescar() {
@@ -269,9 +327,13 @@ function iniciar() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
       elementos.ambiente.dataset.pausado = "true";
+      finalizarAnimaciones();
     } else {
       delete elementos.ambiente.dataset.pausado;
     }
+  });
+  movimientoReducido.addEventListener("change", () => {
+    if (movimientoReducido.matches) finalizarAnimaciones();
   });
   requestAnimationFrame(() => requestAnimationFrame(() => {
     elementos.ambiente.classList.add("ambiente--listo");

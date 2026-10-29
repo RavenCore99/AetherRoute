@@ -58,7 +58,16 @@ test("sin preferencia guardada, el control ofrece el tema opuesto al sistema", (
   const pagina = crearPagina({ oscuro: false });
   assert.equal(pagina.documento.documentElement.dataset.tema, undefined);
   assert.equal(pagina.elementos.get("#tema-etiqueta")?.textContent, "Modo oscuro");
-  assert.equal(pagina.elementos.get("#tema")?.["aria-label"], "Cambiar a tema oscuro");
+  assert.equal(pagina.elementos.get("#tema")?.["aria-label"], "Modo oscuro: activar");
+});
+
+test("el nombre accesible contiene la etiqueta visible antes y después de alternar", () => {
+  const pagina = crearPagina();
+  const tema = pagina.elementos.get("#tema");
+  const etiqueta = pagina.elementos.get("#tema-etiqueta");
+  assert.equal(tema["aria-label"].includes(etiqueta.textContent), true);
+  tema.click();
+  assert.equal(tema["aria-label"].includes(etiqueta.textContent), true);
 });
 
 test("cada clic alterna el tema y guarda la elección explícita", () => {
