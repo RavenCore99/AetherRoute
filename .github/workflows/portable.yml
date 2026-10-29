@@ -1,0 +1,91 @@
+name: Paquetes portables
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "scripts/**"
+      - "web/**"
+      - "balanceador.py"
+      - "servidores.py"
+      - "requirements.txt"
+      - "tests/probar_portable.py"
+      - ".github/workflows/portable.yml"
+  push:
+    tags: ["v[0-9]*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            plataforma: windows-x64
+            extension: .exe
+            formato: zip
+          - os: ubuntu-22.04
+            plataforma: linux-x64
+            extension: ""
+            formato: gztar
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Instalar dependencias de compilación
+        run: python -m pip install -r requirements.txt pyinstaller==6.22.3
+      - name: Empaquetar API y web sin Python de usuario
+        shell: bash
+        run: |
+          python -m PyInstaller --noconfirm --clean --onedir --name AetherRoute \
+            --add-data web:web --paths . --collect-submodules uvicorn \
+            --hidden-import balanceador --hidden-import servidores scripts/demo.py
+      - name: Incluir archivos fuente del taller
+        run: python scripts/preparar_paquete.py dist/AetherRoute
+      - name: Ejercitar ejecutable sin Python del proyecto
+        shell: bash
+        run: python tests/probar_portable.py --binario "dist/AetherRoute/AetherRoute${{ matrix.extension }}"
+      - name: Crear archivo descargable
+        run: python -c "import shutil; shutil.make_archive('AetherRoute-${{ matrix.plataforma }}', '${{ matrix.formato }}', 'dist', 'AetherRoute')"
+      - name: Probar descarga y extracción sin instalador de Python
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $destino = Join-Path $env:RUNNER_TEMP 'portable-extraido'
+          & .\scripts\obtener-windows.ps1 -Destino $destino -ArchivoLocal AetherRoute-windows-x64.zip -NoRun
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tests/probar_portable.py --binario (Join-Path $destino 'AetherRoute\AetherRoute.exe')
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: portable-${{ matrix.plataforma }}
+          path: AetherRoute-${{ matrix.plataforma }}.*
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: portable-*
+          merge-multiple: true
+          path: paquetes
+      - name: Publicar exactamente dos paquetes verificados
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 1
+          python -c "from pathlib import Path; p=Path('paquetes'); a=list(p.iterdir()); assert {x.name for x in a}=={'AetherRoute-windows-x64.zip','AetherRoute-linux-x64.tar.gz'}; assert all(x.stat().st_size>1000000 for x in a)"
+          gh release create "$GITHUB_REF_NAME" paquetes/AetherRoute-windows-x64.zip paquetes/AetherRoute-linux-x64.tar.gz --verify-tag --title "AetherRoute $GITHUB_REF_NAME" --notes "Demo portable local: descarga, descomprime y ejecuta. Windows x64 y Linux x64; sin instalar Python, Git ni Node. Controles de caída y recuperación dentro de la UI; API del taller sin rutas nuevas."
+          gh release view "$GITHUB_REF_NAME" --json assets --jq '.assets[].name' | sort
