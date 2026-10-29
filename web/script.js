@@ -8,6 +8,7 @@ const estado = {
   temporizadorPulso: null,
   animaciones: new Map(),
   repartoAnterior: null,
+  control: null,
   vistaPrevia: location.protocol === "https:" && API_BASE.startsWith("http:"),
 };
 
@@ -27,6 +28,8 @@ const elementos = {
   eventos: document.querySelector("#eventos"),
   actualizar: document.querySelector("#actualizar"),
   solicitar: document.querySelector("#solicitar"),
+  control: document.querySelector("#control-demo"),
+  botonesControl: [1, 2, 3].map((numero) => document.querySelector(`#control-servidor-${numero}`)),
 };
 
 const temaSistema = matchMedia("(prefers-color-scheme: dark)");
@@ -111,6 +114,53 @@ function ocupar(valor) {
   estado.ocupado = valor;
   elementos.actualizar.disabled = valor || estado.vistaPrevia;
   elementos.solicitar.disabled = valor || estado.vistaPrevia;
+  for (const boton of elementos.botonesControl) boton.disabled = valor;
+}
+
+function pintarControles() {
+  for (const servidor of estado.control.servidores) {
+    const boton = elementos.botonesControl[servidor.numero - 1];
+    boton.textContent = `${servidor.activo ? "Detener" : "Recuperar"} servidor ${servidor.numero}`;
+    boton.disabled = estado.ocupado;
+  }
+  elementos.control.hidden = false;
+}
+
+async function consultarControles() {
+  if (!['127.0.0.1', 'localhost'].includes(location.hostname)) return;
+  try {
+    const respuesta = await fetch('/__demo/estado', { cache: 'no-store' });
+    if (!respuesta.ok) return;
+    const control = await respuesta.json();
+    if (!control.token || control.servidores?.length !== 3) return;
+    estado.control = control;
+    pintarControles();
+  } catch {
+    elementos.control.hidden = true;
+  }
+}
+
+async function alternarServidor(numero) {
+  if (estado.ocupado || !estado.control) return;
+  ocupar(true);
+  try {
+    const respuesta = await fetch('/__demo/servidor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Aether-Token': estado.control.token },
+      body: JSON.stringify({ numero }),
+    });
+    if (!respuesta.ok) throw new Error('No se pudo cambiar el servidor.');
+    const actualizado = await respuesta.json();
+    const servidor = estado.control.servidores.find((item) => item.numero === numero);
+    servidor.activo = actualizado.activo;
+    pintarControles();
+    evento(`Servidor ${numero} ${servidor.activo ? 'recuperado' : 'detenido'} desde la demo.`);
+    await refrescar();
+  } catch (error) {
+    evento(error.message, 'error');
+  } finally {
+    ocupar(false);
+  }
 }
 
 function mostrarEsqueletos() {
@@ -316,6 +366,9 @@ function iniciar() {
   });
   elementos.actualizar.addEventListener("click", actualizar);
   elementos.solicitar.addEventListener("click", solicitar);
+  for (const [indice, boton] of elementos.botonesControl.entries()) {
+    boton.addEventListener("click", () => alternarServidor(indice + 1));
+  }
   if (estado.vistaPrevia) {
     elementos.aviso.hidden = false;
     elementos.aviso.textContent = "Vista previa: para consultar la red desde Hosting se necesita una API HTTPS. Usa la demo local para probar las solicitudes.";
@@ -339,6 +392,7 @@ function iniciar() {
     elementos.ambiente.classList.add("ambiente--listo");
   }));
   mostrarEsqueletos();
+  consultarControles();
   actualizar();
 }
 

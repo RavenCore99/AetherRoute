@@ -1,28 +1,45 @@
-# AetherRoute — demo local
+# AetherRoute — demo local portable
 
-La entrega del taller usa `web/index.html`, `web/estilos.css` y `web/script.js` para consultar un balanceador FastAPI y tres servidores. **Se ejecuta en una sola terminal:** `scripts/demo.py` inicia la API, los tres servidores y la web, y abre el navegador. No necesita React, npm, Firebase ni `.env`.
+La entrega usa `web/index.html`, `web/estilos.css` y `web/script.js` para consultar el balanceador FastAPI y tres servidores. Los paquetes portables incluyen esos archivos fuente y la demo completa. **En los equipos de los compañeros no hay que instalar Python, Git ni Node.**
 
-## Windows: instalar y abrir con un comando
+## Windows x64: obtener archivos y abrir con un comando
 
-Instala [Python 3.14 para Windows](https://www.python.org/downloads/windows/) con su lanzador `py`. Abre PowerShell y pega esta línea del repositorio oficial:
+Abre PowerShell (incluido en Windows) y pega este comando del repositorio oficial:
 
 ```powershell
-$f=Join-Path $env:TEMP 'aetherroute-instalar.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/RavenCore99/AetherRoute/main/scripts/instalar-windows.ps1' -OutFile $f; powershell.exe -NoProfile -ExecutionPolicy Bypass -File $f
+$f=Join-Path $env:TEMP 'aetherroute-obtener.ps1'; Invoke-WebRequest -UseBasicParsing 'https://raw.githubusercontent.com/RavenCore99/AetherRoute/main/scripts/obtener-windows.ps1' -OutFile $f; powershell.exe -NoProfile -ExecutionPolicy Bypass -File $f
 ```
 
-El script pregunta en qué **carpeta nueva** guardar el proyecto: descarga el ZIP público de `main`, lo descomprime allí, crea `.venv`, instala las dependencias y abre la demo. No requiere Git ni WSL. El script es código ejecutable descargado de este repositorio; puedes [revisarlo antes de ejecutarlo](scripts/instalar-windows.ps1). No introduzcas credenciales ni uses una URL distinta.
+Descarga el último paquete publicado en [GitHub Releases](https://github.com/RavenCore99/AetherRoute/releases/latest), comprueba su SHA-256 contra GitHub, lo descomprime en `AetherRoute` dentro de tu carpeta personal y abre `AetherRoute.exe`. Los fuentes del taller están dentro de `AetherRoute/fuentes/`. Si la carpeta ya existe, crea otra sin sobrescribirla. Puedes [revisar el script](scripts/obtener-windows.ps1) antes de ejecutarlo. Windows puede advertir sobre un ejecutable no firmado: verifica que el enlace proviene de este repositorio; no introduzcas credenciales.
 
-En la misma terminal, escribe `1`, `2` o `3` para detener o recuperar ese servidor y ver el cambio en el navegador; escribe `q` para detener todo. El instalador muestra el comando para volver a abrir la demo sin descargarla de nuevo. Necesitas internet para la descarga y la instalación inicial, pero no para ejecutar el proyecto ya instalado.
+Para volver a abrirla, ejecuta el `.exe` de la carpeta descargada. Internet solo se necesita para la primera descarga; la demo funciona local y sin conexión después. Mantén abierta la ventana de la demo; `q` cierra sus servicios al terminar.
 
-## Requisitos para Linux/WSL
+## Linux x64 (CachyOS): paquete sin instalar Python
 
-- Linux o Windows con WSL (los scripts siguientes usan Bash y `/proc`).
-- Python 3.14 con `venv`, Git y conexión a internet para instalar paquetes la primera vez.
-- Puertos locales 5500 y 8000–8003 libres.
+En Bash, con `curl` y `tar` del sistema:
 
-## Desde un clon nuevo (Linux/WSL)
+```sh
+curl -fsSL https://raw.githubusercontent.com/RavenCore99/AetherRoute/main/scripts/obtener-linux.sh | bash
+```
 
-En una sola terminal:
+Los archivos quedan en `~/AetherRoute/AetherRoute/`; ejecútalo de nuevo con `~/AetherRoute/AetherRoute/AetherRoute`. Es un paquete Linux x64, no un binario de Windows/WSL. En Linux puede requerir bibliotecas básicas del sistema (glibc), pero no Python ni npm.
+
+## Probar las seis situaciones del PDF sin salir de la interfaz
+
+Con los puertos 5500 y 8000–8003 libres, el lanzador abre `http://127.0.0.1:5500/`. En la página:
+
+1. Consulta los tres servidores activos en **Estado**.
+2. Pulsa **Enviar solicitud** cinco veces; observa la rotación y el total.
+3. Pulsa **Detener servidor 2** en **Simular fallos**; la tabla lo muestra inactivo.
+4. Comprueba que **Reparto** cambia al enviar solicitudes.
+5. Detén los servidores 1 y 3 desde los mismos botones; **Enviar solicitud** muestra «No hay servidores disponibles».
+6. Pulsa **Recuperar servidor 1/2/3**; la tabla y las solicitudes vuelven a funcionar.
+
+El control de demo es local y está separado de las cuatro rutas de la API del taller; en Hosting público no se muestra. El tema claro/oscuro, el skeleton y la iluminación no sustituyen los datos reales. El contador se reinicia al cerrar la demo.
+
+## Desarrollo desde un clon (opcional)
+
+Para editar el código, sí se necesita Git y Python 3.14. Desde un clon nuevo:
 
 ```sh
 git clone https://github.com/RavenCore99/AetherRoute.git
@@ -32,15 +49,15 @@ python3.14 -m venv .venv
 .venv/bin/python scripts/demo.py
 ```
 
-El lanzador abre `http://127.0.0.1:5500/`; si no se abre automáticamente, usa esa dirección. Para volver a ejecutar el clon instalado, basta `.venv/bin/python scripts/demo.py` en su carpeta. **No** abras `web/index.html` directamente. Cada equipo arranca su propia API; las solicitudes y estadísticas solo viven en la memoria de sus procesos y se reinician al apagarlos.
+El lanzador abre `http://127.0.0.1:5500/`; si no se abre automáticamente, usa esa dirección. Para volver a ejecutar el clon instalado, basta `.venv/bin/python scripts/demo.py`. **No** abras `web/index.html` directamente.
 
-## Probar fallos y recuperación
+## Control avanzado por terminal (opcional)
 
 - En la terminal de la demo, escribe `2` y pulsa **Actualizar** para ver el servidor 2 inactivo. Escribe `2` otra vez y pulsa **Actualizar** para recuperarlo.
 - Escribe `1`, `2`, `3` para detenerlos todos; **Enviar solicitud** mostrará el error 503. Repite `1`, `2`, `3` para recuperarlos sin reiniciar el balanceador.
 - Escribe `q` para cerrar la demo y detener sus cinco procesos. `scripts/demo.py` no detiene procesos ajenos si un puerto ya estaba ocupado.
 
-`scripts/iniciar.sh` y `scripts/detener.sh` quedan disponibles para pruebas manuales avanzadas, pero no son necesarios para arrancar ni probar la demo habitual.
+`scripts/iniciar.sh` y `scripts/detener.sh` quedan disponibles para diagnósticos. `scripts/instalar-windows.ps1` es el instalador anterior, que sí exige Python; no es la ruta principal para compañeros.
 
 ## Pruebas automatizadas (opcional)
 
