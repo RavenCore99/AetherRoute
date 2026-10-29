@@ -71,7 +71,20 @@ def iniciar(puerto: int) -> subprocess.Popen:
     banderas = (
         getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0) if os.name == "nt" else 0
     )
-    proceso = subprocess.Popen(comando, cwd=RAIZ, creationflags=banderas)
+    entorno = (
+        {**os.environ, "PYINSTALLER_RESET_ENVIRONMENT": "1"}
+        if getattr(sys, "frozen", False)
+        else None
+    )
+    LOGGER.info("Iniciando servicio %s", puerto)
+    proceso = subprocess.Popen(
+        comando,
+        cwd=RAIZ,
+        creationflags=banderas,
+        stdin=subprocess.DEVNULL,
+        env=entorno,
+    )
+    LOGGER.info("Servicio %s creado", puerto)
     esperar(puerto, proceso)
     return proceso
 

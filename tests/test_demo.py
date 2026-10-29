@@ -165,6 +165,24 @@ def test_binario_portable_reutiliza_su_ejecutable_para_cada_servicio(monkeypatch
         ]
 
 
+def test_hijos_portables_no_heredan_entrada_y_reinician_bootloader(monkeypatch):
+    monkeypatch.syspath_prepend(str(RAIZ / "scripts"))
+    demo = importlib.import_module("demo")
+    monkeypatch.setattr(demo.sys, "frozen", True, raising=False)
+    monkeypatch.setattr(demo, "libre", lambda puerto: True)
+    monkeypatch.setattr(demo, "esperar", lambda puerto, proceso: None)
+    llamados = []
+
+    def lanzar(*args, **kwargs):
+        llamados.append((args, kwargs))
+        return object()
+
+    monkeypatch.setattr(demo.subprocess, "Popen", lanzar)
+    demo.iniciar(8002)
+    assert llamados[0][1]["stdin"] == subprocess.DEVNULL
+    assert llamados[0][1]["env"]["PYINSTALLER_RESET_ENVIRONMENT"] == "1"
+
+
 def test_control_local_no_entrega_token_a_origen_ajeno():
     proceso = subprocess.Popen(
         [sys.executable, str(RAIZ / "scripts/demo.py"), "--no-browser"],
