@@ -38,7 +38,7 @@ jobs:
       - name: Verificar JavaScript de la interfaz
         run: |
           node --check web/script.js
-          node --test tests/theme.test.cjs
+          node --test tests/theme.test.cjs tests/loading.test.cjs
   windows-demo:
     runs-on: windows-latest
     steps:
