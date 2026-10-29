@@ -32,13 +32,13 @@ jobs:
           .venv/bin/python -m pip install -r requirements-dev.txt
       - name: Verificar pruebas y estilo
         run: |
-          .venv/bin/python -m ruff check tests scripts/demo.py
-          .venv/bin/python -m ruff format --check tests scripts/demo.py
+          .venv/bin/python -m ruff check tests scripts/demo.py scripts/control_local.py
+          .venv/bin/python -m ruff format --check tests scripts/demo.py scripts/control_local.py
           .venv/bin/python -m pytest tests -q
       - name: Verificar JavaScript de la interfaz
         run: |
           node --check web/script.js
-          node --test tests/theme.test.cjs tests/loading.test.cjs tests/ambient.test.cjs tests/motion.test.cjs
+          node --test tests/theme.test.cjs tests/loading.test.cjs tests/ambient.test.cjs tests/motion.test.cjs tests/control.test.cjs
   windows-demo:
     runs-on: windows-latest
     steps:

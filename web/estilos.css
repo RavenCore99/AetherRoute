@@ -264,6 +264,12 @@ td:nth-child(2) .esqueleto--texto { width: 3.5rem; }
 .tema-control span[aria-hidden] { font-size: 1.2rem; line-height: 1; }
 .boton:disabled { cursor: not-allowed; opacity: 0.55; }
 .boton:focus-visible { outline: 3px solid var(--ui-accent); outline-offset: 3px; }
+.controles-servidores {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-3);
+}
 .tabla-contenedor { position: relative; overflow-x: auto; margin-top: var(--espacio-3); min-height: 13rem; }
 #vacio-servidores:not([hidden]) {
   position: absolute;
@@ -340,6 +346,7 @@ td { font-variant-numeric: tabular-nums; }
   th, td { padding-inline: 0.25rem; }
   th { font-size: 0.68rem; letter-spacing: 0; }
   td { font-size: 0.88rem; }
+  .controles-servidores { grid-template-columns: minmax(0, 1fr); }
   .estadistica { grid-template-columns: 1fr auto; }
   .estadistica .barra { grid-column: 1 / -1; grid-row: 2; }
 }
