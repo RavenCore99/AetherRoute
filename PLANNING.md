@@ -145,10 +145,10 @@ Fuente: `hermes_desktop_desing/`. Es **inspiración**, no código a copiar.
 - [x] **Skeleton** en tarjetas, tabla y barras mientras llega la primera respuesta (nunca el texto "Cargando…").
 - [x] **Shimmer** en los skeletons (gradiente animado con `transform`/`background-position`).
 - [x] **Ambient lighting:** 2–3 resplandores radiales de baja opacidad detrás del contenido, deriva lenta; el color puede reflejar el estado (verde: todos activos, ámbar: parcial, rojo: ninguno).
-- [ ] Contadores numéricos con animación breve; barras con transición de ancho.
+- [x] Contadores numéricos con animación breve; barras con transición de ancho.
 - [x] Transiciones de ~100 ms en controles; listar propiedades, **sin `transition-all`**.
-- [ ] `prefers-reduced-motion`: desactivar shimmer, ambient y contadores animados.
-- [ ] Estados vacío y error con un único componente visual cada uno.
+- [x] `prefers-reduced-motion`: desactivar shimmer, ambient y contadores animados.
+- [x] Estados vacío y error con un único componente visual cada uno.
 - [x] Accesibilidad: foco visible, contraste AA, `aria-live="polite"` en mensajes, estados no dependientes solo del color.
 - [x] Responsive: 360 px → escritorio.
 
